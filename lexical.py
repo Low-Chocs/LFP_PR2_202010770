@@ -7,11 +7,16 @@ class lexical_analyzer:
     
     def __init__(self):
         self.token_list = []
+        self.final_token_list = []
         self.error_list = []
         self.semantic_error_list = []
         self.entry_text = ""
 
     def analyzer(self, text: str):
+        
+        self.token_list = []
+        self.error_list = []
+        self.semantic_error_list = []
         text += "#"
         state = 0
         line = 1
@@ -139,13 +144,16 @@ class lexical_analyzer:
         for char in range(len(text)):
             letter = text[char]
 
-            if letter ==  '#':
+            if letter ==  '#' and state != 11 and state != 12 :
                 print("Se ha terminado la lectura")
                 break
 
             if letter==" ":
                 column+=1
-                continue
+                if state != 9 or state or 10 or state != 11 or state != 12 or state != 13 or state != 14 or state != 15 or state != 16:
+                    pass
+                else:
+                    continue
                 
             if letter=="\n":
                 line+=1
@@ -162,6 +170,7 @@ class lexical_analyzer:
                     r_resultado = True
                     state = 1
                     new_word += letter
+                    print("Estado 1")
 
                 #V -> VS | VISITANTE
                 elif letter == 'V':
@@ -173,10 +182,8 @@ class lexical_analyzer:
                 #T -> TEMPORADA | TABLA | TOTAL | TOP
                 elif letter == 'T':
                     t_temporada = True
-                    t_tabla = True
-                    t_total = True
-                    t_top = True
                     state = 1
+                    print('Estado 0')
                     new_word += letter
                 
                 #J -> JORNADA
@@ -220,8 +227,29 @@ class lexical_analyzer:
                     a_adios = True
                     state = 1
                     new_word += letter
+                
+                elif letter == '-':
+                    new_word += letter
+                    state = 9
+                
+                elif letter == '<':
+                    new_word = letter
+                    state = 15
+                    token = Token("Apertura",new_word, line, column)
+                    self.token_list.append(token)
+                    new_word = ''
+                
+                elif letter == '\"' or letter == '\'':
+                    state = 16
+                
+                elif letter == '[' or letter == ']':
+                    continue
+
                 else:
-                    print("No se reconociokahkjhfadskhfdasjkhfsdjkahsadfjk")
+                        error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
+                        new_word = ""
+                        self.error_list.append(error)
+                        state = 0
 
             elif state == 1:
     
@@ -231,12 +259,13 @@ class lexical_analyzer:
                         e_resultado = True
                         state = 2
                         new_word += letter
+                        print("Estado 2")
                     else:
-                        new_word = ""
                         r_resultado = False
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
                         
 
                 #VS -> VS | VI -> VISITANTE
@@ -253,11 +282,11 @@ class lexical_analyzer:
                         state = 2
                         new_word += letter
                     else:
-                        new_word = ""
                         v_vs = False
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
 
                         
                 #TE -> TEMPORADA |TA -> TABLA |TO -> TOTAL | TOP
@@ -266,20 +295,22 @@ class lexical_analyzer:
                         e_temporada = True
                         new_word += letter
                         state = 2
+                        print('Estado 2')
                     elif letter == 'A':
                         a_tabla = True
                         new_word += letter
                         state = 2
                     elif letter == 'O':
-                        o_top == True
+                        o_top = True
                         new_word += letter
                         state = 2
+                        print('state 2')
                     else: 
-                        new_word = ""
                         t_temporada = False
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
                 
                 #JO -> JORNADA
                 elif j_jornada:
@@ -288,11 +319,11 @@ class lexical_analyzer:
                         state = 2
                         new_word += letter
                     else:
-                        new_word = ""
                         j_jornada = False
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
 
                 #GO -> GOLES
                 elif g_goles:
@@ -301,11 +332,11 @@ class lexical_analyzer:
                         state = 2
                         new_word += letter
                     else:
-                        new_word = ""
                         g_goles = False
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
 
                 #LO _> LOCAL
                 elif l_local:
@@ -314,11 +345,11 @@ class lexical_analyzer:
                         state = 2
                         new_word += letter
                     else:
-                        new_word = ""
                         l_local = False
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
                 
                 #PA -> PARTIDOS
                 elif p_partidos:
@@ -327,11 +358,11 @@ class lexical_analyzer:
                         state = 2
                         new_word += letter
                     else:
-                        new_word = ""
                         p_partidos = False
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
                 
                 #SU -> SUPERIOR
                 elif s_superior:
@@ -340,34 +371,36 @@ class lexical_analyzer:
                         state = 2
                         new_word += letter
                     else:
-                        new_word = ""
                         s_superior = False
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
 
-                #I -> INFERIOR
+                #IN -> INFERIOR
                 elif i_inferior:
                     if letter == 'N':
+                        new_word += letter
                         n_inferior = True
                         state = 2
                     else:
-                        new_word = ""
                         i_inferior = False
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
-                # A -> ADIOS
+                        new_word = ""
+                # AD -> ADIOS
                 elif a_adios:
                     if letter == 'D':
+                        new_word += letter
                         d_adios = True
                         state = 2
                     else:
-                        new_word = ""
                         a_adios = False
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
 
             elif state == 2:
         
@@ -377,13 +410,14 @@ class lexical_analyzer:
                         s_resultado = True
                         state = 3
                         new_word += letter
+                        print("Estado 3")
                     else:
-                        new_word = ""
                         r_resultado = False
                         e_resultado = False
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
                         
 
                 #VIS -> VISITANTE
@@ -393,12 +427,12 @@ class lexical_analyzer:
                         state = 3
                         new_word += letter
                     else:
-                        new_word = ""
                         v_vs = False
                         i_visitante = False
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
 
                         
                 #TEM -> TEMPORADA |TAB -> TABLA |TOT -> TOTAL |TOP ->TOP
@@ -407,25 +441,26 @@ class lexical_analyzer:
                         m_temporada = True
                         new_word += letter
                         state = 3
+                        print('Estado 3')
                     else: 
-                        new_word = ""
                         t_temporada = False
                         e_temporada = False
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
                 elif a_tabla:
                     if letter == 'B':
                         b_tabla = True
                         new_word += letter
                         state = 3
                     else: 
-                        new_word = ""
                         t_temporada = False
                         a_tabla = False
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
                 elif o_top:
                     if letter == 'P':
                         new_word += letter
@@ -435,17 +470,18 @@ class lexical_analyzer:
                         t_temporada = False
                         o_top = False
                         state=0
-                    if letter == 'T':
+                    elif letter == 'T':
                         t_total = True
                         new_word += letter
                         state = 3
+                        print('state 3')
                     else: 
-                        new_word = ""
                         t_temporada = False
                         o_top = False
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
 
                 
                 #JOR -> JORNADA
@@ -455,12 +491,12 @@ class lexical_analyzer:
                         state = 3
                         new_word += letter
                     else:
-                        new_word = ""
                         j_jornada = False
                         o_jornada = False
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
 
                 #GOL -> GOLES
                 elif o_goles:
@@ -469,26 +505,26 @@ class lexical_analyzer:
                         state = 3
                         new_word += letter
                     else:
-                        new_word = ""
                         g_goles = False
                         o_goles = False
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
 
                 #LOC _> LOCAL
                 elif o_local:
-                    if letter == 'O':
+                    if letter == 'C':
                         c_local = True
                         state = 3
                         new_word += letter
                     else:
-                        new_word = ""
                         l_local = False
                         o_local = False
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
                 
                 #PAR -> PARTIDOS
                 elif a_partidos:
@@ -497,12 +533,12 @@ class lexical_analyzer:
                         state = 3
                         new_word += letter
                     else:
-                        new_word = ""
                         p_partidos = False
                         a_partidos = False
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
                 
                 #SUP -> SUPERIOR
                 elif u_superior:
@@ -511,38 +547,40 @@ class lexical_analyzer:
                         state = 3
                         new_word += letter
                     else:
-                        new_word = ""
                         s_superior = False
                         u_superior = False
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
 
                 #INF -> INFERIOR
                 elif n_inferior:
                     if letter == 'F':
                         f_inferior = True
                         state = 3
+                        new_word += letter
                     else:
-                        new_word = ""
                         i_inferior = False
                         n_inferior = False
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
 
                 # ADI -> ADIOS
                 elif d_adios:
                     if letter == 'I':
+                        new_word += letter
                         i_adios = True
                         state = 3
                     else:
-                        new_word = ""
                         a_adios = False
                         d_adios = False
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
 
             elif state == 3:
             
@@ -552,14 +590,15 @@ class lexical_analyzer:
                         u_resultado = True
                         state = 4
                         new_word += letter
+                        print("Estado 4")
                     else:
-                        new_word = ""
                         r_resultado = False
                         e_resultado = False
                         s_resultado = False
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
                         
 
                 #VISI -> VISITANTE
@@ -569,13 +608,13 @@ class lexical_analyzer:
                         state = 4
                         new_word += letter
                     else:
-                        new_word = ""
                         v_vs = False
                         i_visitante = False
                         s_visitante = False
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
 
                         
                 #TEMP -> TEMPORADA |TABL -> TABLA |TOT -> TOTAL 
@@ -584,41 +623,43 @@ class lexical_analyzer:
                         p_temporada = True
                         new_word += letter
                         state = 4
+                        print('ESTADO 4')
                     else: 
-                        new_word = ""
                         t_temporada = False
                         e_temporada = False
                         m_temporada = False
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
                 elif b_tabla:
                     if letter == 'L':
                         l_tabla = True
                         new_word += letter
                         state = 4
                     else: 
-                        new_word = ""
                         t_temporada = False
                         a_tabla = False
                         b_tabla = False
                         error = Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
-                        state = 0   
+                        state = 0  
+                        new_word = ""
 
                 elif t_total:
                     if letter == 'A':
                         a_total= True
                         new_word += letter
                         state = 4
+                        print('state 4')
                     else: 
-                        new_word = ""
                         t_temporada = False
                         o_top = False
                         t_total = False
                         error = Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0  
+                        new_word = ""
 
                 #JORN -> JORNADA
                 elif r_jornada:
@@ -627,13 +668,13 @@ class lexical_analyzer:
                         state = 4
                         new_word += letter
                     else:
-                        new_word = ""
                         j_jornada = False
                         o_jornada = False
                         r_jornada = False
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
 
                 #GOLE -> GOLES
                 elif l_goles:
@@ -642,13 +683,13 @@ class lexical_analyzer:
                         state = 4
                         new_word += letter
                     else:
-                        new_word = ""
                         g_goles = False
                         o_goles = False
                         l_goles = False
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
 
                 #LOCA _> LOCAL
                 elif c_local:
@@ -657,13 +698,13 @@ class lexical_analyzer:
                         state = 4
                         new_word += letter
                     else:
-                        new_word = ""
                         l_local = False
                         o_local = False
                         c_local = False
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
                 
                 #PART -> PARTIDOS
                 elif r_partidos:
@@ -672,13 +713,13 @@ class lexical_analyzer:
                         state = 4
                         new_word += letter
                     else:
-                        new_word = ""
                         p_partidos = False
                         a_partidos = False
                         r_partidos = False
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
                 
                 #SUPE -> SUPERIOR
                 elif p_superior:
@@ -687,41 +728,43 @@ class lexical_analyzer:
                         state = 4
                         new_word += letter
                     else:
-                        new_word = ""
                         s_superior = False
                         u_superior = False
                         p_superior = False
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
 
                 #INFE -> INFERIOR
                 elif f_inferior:
                     if letter == 'E':
-                        f_inferior = True
+                        e_inferior = True
                         state = 4
+                        new_word += letter
                     else:
-                        new_word = ""
                         i_inferior = False
                         n_inferior = False
                         f_inferior = False
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
 
                 # ADIO -> ADIOS
                 elif i_adios:
                     if letter == 'O':
+                        new_word += letter
                         o_adios = True
                         state = 4
                     else:
-                        new_word = ""
                         a_adios = False
                         d_adios = False
                         i_adios = False
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
 
             elif state == 4:
                 
@@ -731,8 +774,8 @@ class lexical_analyzer:
                         l_resultado = True
                         state = 5
                         new_word += letter
+                        print("Estado 5")
                     else:
-                        new_word = ""
                         r_resultado = False
                         e_resultado = False
                         s_resultado = False
@@ -740,6 +783,7 @@ class lexical_analyzer:
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
                         
 
                 #VISITA -> VISITANTE
@@ -749,7 +793,6 @@ class lexical_analyzer:
                         state = 5
                         new_word += letter
                     else:
-                        new_word = ""
                         v_vs = False
                         i_visitante = False
                         s_visitante = False
@@ -757,6 +800,7 @@ class lexical_analyzer:
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
 
                         
                 #TEMPO -> TEMPORADA |TABLA -> TABLA |TOTAL -> TOTAL 
@@ -765,8 +809,8 @@ class lexical_analyzer:
                         o_temporada = True
                         new_word += letter
                         state = 5
+                        print('Estado 5')
                     else: 
-                        new_word = ""
                         t_temporada = False
                         e_temporada = False
                         m_temporada = False
@@ -774,6 +818,7 @@ class lexical_analyzer:
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
                 elif l_tabla:
                     if letter == 'A':
                         new_word += letter
@@ -786,14 +831,14 @@ class lexical_analyzer:
                         l_tabla = False
                         state=0
                     else: 
-                        new_word = ""
                         t_temporada = False
                         a_tabla = False
                         b_tabla = False
                         l_tabla = False
                         error = Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
-                        state = 0   
+                        state = 0 
+                        new_word = ""  
 
                 elif a_total:
                     if letter == 'L':
@@ -805,16 +850,17 @@ class lexical_analyzer:
                         o_top = False
                         t_total = False
                         a_total = False
+                        print('state 5')
                         state=0
                     else: 
-                        new_word = ""
                         t_temporada = False
                         o_top = False
                         t_total = False
                         a_total = False
                         error = Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
-                        state = 0  
+                        state = 0
+                        new_word = ""  
 
                 #JORNA -> JORNADA
                 elif n_jornada:
@@ -823,7 +869,6 @@ class lexical_analyzer:
                         state = 5
                         new_word += letter
                     else:
-                        new_word = ""
                         j_jornada = False
                         o_jornada = False
                         r_jornada = False
@@ -831,6 +876,7 @@ class lexical_analyzer:
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
 
                 #GOLES -> GOLES
                 elif e_goles:
@@ -845,7 +891,6 @@ class lexical_analyzer:
                         e_goles = False
                         state=0
                     else:
-                        new_word = ""
                         g_goles = False
                         o_goles = False
                         l_goles = False
@@ -853,6 +898,7 @@ class lexical_analyzer:
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
 
                 #LOCAL _> LOCAL
                 elif a_local:
@@ -867,7 +913,6 @@ class lexical_analyzer:
                         a_local = False
                         state=0
                     else:
-                        new_word = ""
                         l_local = False
                         o_local = False
                         c_local = False
@@ -875,6 +920,7 @@ class lexical_analyzer:
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
                 
                 #PARTI -> PARTIDOS
                 elif t_partidos:
@@ -883,7 +929,6 @@ class lexical_analyzer:
                         state = 5
                         new_word += letter
                     else:
-                        new_word = ""
                         p_partidos = False
                         a_partidos = False
                         r_partidos = False
@@ -891,6 +936,7 @@ class lexical_analyzer:
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
                 
                 #SUPER -> SUPERIOR
                 elif e_superior:
@@ -899,7 +945,6 @@ class lexical_analyzer:
                         state = 5
                         new_word += letter
                     else:
-                        new_word = ""
                         s_superior = False
                         u_superior = False
                         p_superior = False
@@ -907,14 +952,15 @@ class lexical_analyzer:
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
 
                 #INFER -> INFERIOR
                 elif e_inferior:
                     if letter == 'R':
                         r_inferior = True
                         state = 5
+                        new_word += letter
                     else:
-                        new_word = ""
                         i_inferior = False
                         n_inferior = False
                         f_inferior = False
@@ -922,6 +968,7 @@ class lexical_analyzer:
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
 
                 # ADIOS -> ADIOS
                 elif o_adios:
@@ -936,7 +983,6 @@ class lexical_analyzer:
                         o_adios = False
                         state=0
                     else:
-                        new_word = ""
                         a_adios = False
                         d_adios = False
                         i_adios = False
@@ -944,17 +990,18 @@ class lexical_analyzer:
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
 
             elif state == 5:
                 
                 #RESULT -> RESULTADO
                 if l_resultado:
                     if letter == 'T':
-                        a_resultado = True
+                        t_resultado = True
                         state = 6
                         new_word += letter
+                        print("Estado 6")
                     else:
-                        new_word = ""
                         r_resultado = False
                         e_resultado = False
                         s_resultado = False
@@ -963,7 +1010,7 @@ class lexical_analyzer:
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
-                        
+                        new_word = ""
 
                 #VISITA -> VISITANTE
                 elif t_visitante:
@@ -972,7 +1019,6 @@ class lexical_analyzer:
                         state = 6
                         new_word += letter
                     else:
-                        new_word = ""
                         v_vs = False
                         i_visitante = False
                         s_visitante = False
@@ -981,16 +1027,17 @@ class lexical_analyzer:
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
 
                         
                 #TEMPOR -> TEMPORADA 
                 elif o_temporada:
                     if letter == 'R':
-                        a_temporada = True
+                        r_temporada = True
                         new_word += letter
                         state = 6
+                        print('Estado 6')
                     else: 
-                        new_word = ""
                         t_temporada = False
                         e_temporada = False
                         m_temporada = False
@@ -999,6 +1046,7 @@ class lexical_analyzer:
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
 
                 #JORNAD -> JORNADA
                 elif a_jornada:
@@ -1007,7 +1055,6 @@ class lexical_analyzer:
                         state = 6
                         new_word += letter
                     else:
-                        new_word = ""
                         j_jornada = False
                         o_jornada = False
                         r_jornada = False
@@ -1016,6 +1063,7 @@ class lexical_analyzer:
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
                 
                 #PARTID -> PARTIDOS
                 elif i_partidos:
@@ -1024,7 +1072,6 @@ class lexical_analyzer:
                         state = 6
                         new_word += letter
                     else:
-                        new_word = ""
                         p_partidos = False
                         a_partidos = False
                         r_partidos = False
@@ -1033,6 +1080,7 @@ class lexical_analyzer:
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
                 
                 #SUPERI -> SUPERIOR
                 elif r_superior:
@@ -1041,7 +1089,7 @@ class lexical_analyzer:
                         state = 6
                         new_word += letter
                     else:
-                        new_word = ""
+
                         s_superior = False
                         u_superior = False
                         p_superior = False
@@ -1050,14 +1098,16 @@ class lexical_analyzer:
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
 
                 #INFERI -> INFERIOR
                 elif r_inferior:
                     if letter == 'I':
-                        r_inferior = True
+                        i_inferior = True
                         state = 6
+                        new_word += letter
                     else:
-                        new_word = ""
+
                         i_inferior = False
                         n_inferior = False
                         f_inferior = False
@@ -1066,6 +1116,7 @@ class lexical_analyzer:
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
 
             elif state == 6:
                 
@@ -1075,8 +1126,9 @@ class lexical_analyzer:
                         a_resultado = True
                         state = 7
                         new_word += letter
+                        print("Estado 6")
                     else:
-                        new_word = ""
+
                         r_resultado = False
                         e_resultado = False
                         s_resultado = False
@@ -1086,6 +1138,7 @@ class lexical_analyzer:
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
                         
 
                 #VISITA -> VISITANTE
@@ -1095,15 +1148,17 @@ class lexical_analyzer:
                         state = 7
                         new_word += letter
                     else:
-                        new_word = ""
+
                         v_vs = False
                         i_visitante = False
+        
                         s_visitante = False
                         i_visitante2 = False
                         t_visitante = False
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
 
                         
                 #TEMPORA -> TEMPORADA 
@@ -1112,8 +1167,8 @@ class lexical_analyzer:
                         a_temporada = True
                         new_word += letter
                         state = 7
+                        print('estado 7')
                     else: 
-                        new_word = ""
                         t_temporada = False
                         e_temporada = False
                         m_temporada = False
@@ -1123,6 +1178,7 @@ class lexical_analyzer:
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
 
                 #JORNADA -> JORNADA
                 elif d_jornada:
@@ -1139,7 +1195,7 @@ class lexical_analyzer:
                         d_jornada = False
                         state=0
                     else:
-                        new_word = ""
+
                         j_jornada = False
                         o_jornada = False
                         r_jornada = False
@@ -1149,6 +1205,7 @@ class lexical_analyzer:
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
                 
                 #PARTIDO -> PARTIDOS
                 elif d_partidos:
@@ -1157,7 +1214,6 @@ class lexical_analyzer:
                         state = 7
                         new_word += letter
                     else:
-                        new_word = ""
                         p_partidos = False
                         a_partidos = False
                         r_partidos = False
@@ -1167,6 +1223,7 @@ class lexical_analyzer:
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
                 
                 #SUPERIO -> SUPERIOR
                 elif i_superior:
@@ -1175,7 +1232,7 @@ class lexical_analyzer:
                         state = 7
                         new_word += letter
                     else:
-                        new_word = ""
+
                         s_superior = False
                         u_superior = False
                         p_superior = False
@@ -1185,14 +1242,16 @@ class lexical_analyzer:
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
 
                 #INFERIO -> INFERIOR
                 elif i_inferior:
                     if letter == 'O':
                         o_inferior = True
                         state = 7
+                        new_word += letter
                     else:
-                        new_word = ""
+
                         i_inferior = False
                         n_inferior = False
                         f_inferior = False
@@ -1202,6 +1261,7 @@ class lexical_analyzer:
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
 
             elif state == 7:
                 
@@ -1211,8 +1271,9 @@ class lexical_analyzer:
                         d_resultado = True
                         state = 8
                         new_word += letter
+                        print("Estado 7")
                     else:
-                        new_word = ""
+
                         r_resultado = False
                         e_resultado = False
                         s_resultado = False
@@ -1223,6 +1284,7 @@ class lexical_analyzer:
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
                         
 
                 #VISITANT -> VISITANTE
@@ -1232,7 +1294,7 @@ class lexical_analyzer:
                         state = 8
                         new_word += letter
                     else:
-                        new_word = ""
+
                         v_vs = False
                         i_visitante = False
                         s_visitante = False
@@ -1243,25 +1305,16 @@ class lexical_analyzer:
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
 
                         
-                #TEMPORADA -> TEMPORADA 
-                elif d_temporada:
-                    if letter == 'A':
+                #TEMPORAD -> TEMPORADA 
+                elif a_temporada:
+                    if letter == 'D':
                         new_word += letter
-                        token = Token("Palabra Reservada",new_word, line, column)
-                        self.token_list.append(token)
-                        new_word = ""
-                        t_temporada = False
-                        e_temporada = False
-                        m_temporada = False
-                        p_temporada = False
-                        o_temporada = False
-                        r_temporada = False
-                        d_temporada = False
-                        state=0
+                        d_temporada = True
+                        state = 8
                     else: 
-                        new_word = ""
                         t_temporada = False
                         e_temporada = False
                         m_temporada = False
@@ -1272,6 +1325,7 @@ class lexical_analyzer:
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
                 
                 #PARTIDOS -> PARTIDOS
                 elif o_partidos:
@@ -1289,7 +1343,7 @@ class lexical_analyzer:
                         o_partidos = False
                         state=0
                     else:
-                        new_word = ""
+
                         p_partidos = False
                         a_partidos = False
                         r_partidos = False
@@ -1300,6 +1354,7 @@ class lexical_analyzer:
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
                 
                 #SUPERIOR -> SUPERIOR
                 elif o_superior:
@@ -1317,7 +1372,6 @@ class lexical_analyzer:
                         o_superior = False
                         state=0
                     else:
-                        new_word = ""
                         s_superior = False
                         u_superior = False
                         p_superior = False
@@ -1328,6 +1382,7 @@ class lexical_analyzer:
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
 
                 #INFERIOR -> INFERIOR
                 elif o_inferior:
@@ -1345,7 +1400,7 @@ class lexical_analyzer:
                         o_inferior = False
                         state=0
                     else:
-                        new_word = ""
+
                         i_inferior = False
                         n_inferior = False
                         f_inferior = False
@@ -1356,6 +1411,7 @@ class lexical_analyzer:
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
 
             elif state == 8:
                 
@@ -1365,6 +1421,7 @@ class lexical_analyzer:
                         new_word += letter
                         token = Token("Palabra Reservada",new_word, line, column)
                         self.token_list.append(token)
+                        print("Estado 8")
                         new_word = ""
                         r_resultado = False
                         e_resultado = False
@@ -1376,7 +1433,7 @@ class lexical_analyzer:
                         d_resultado = False
                         state = 0
                     else:
-                        new_word = ""
+
                         r_resultado = False
                         e_resultado = False
                         s_resultado = False
@@ -1388,7 +1445,7 @@ class lexical_analyzer:
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
-                        
+                        new_word = ""
 
                 #VISITANTE -> VISITANTE
                 elif t_visitante2:
@@ -1407,7 +1464,7 @@ class lexical_analyzer:
                         t_visitante2 = False
                         state=0
                     else:
-                        new_word = ""
+
                         v_vs = False
                         i_visitante = False
                         s_visitante = False
@@ -1419,8 +1476,178 @@ class lexical_analyzer:
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         self.error_list.append(error)
                         state = 0
+                        new_word = ""
+                
+                #TEMPORAD -> TEMPORADA 
+                elif d_temporada:
+                    if letter == 'A':
+                        new_word += letter
+                        token = Token("Palabra Reservada",new_word, line, column)
+                        self.token_list.append(token)
+                        print('Estado 9')
+                        new_word = ""
+                        t_temporada = False
+                        e_temporada = False
+                        m_temporada = False
+                        p_temporada = False
+                        o_temporada = False
+                        r_temporada = False
+                        d_temporada = False
+                        state=0
+                    else: 
 
-    def clean(self):
-        self.token_list = []
-        self.errror_list = []
-        self.semantic_error_list = []
+                        t_temporada = False
+                        e_temporada = False
+                        m_temporada = False
+                        p_temporada = False
+                        o_temporada = False
+                        r_temporada = False
+                        d_temporada = False
+                        error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
+                        self.error_list.append(error)
+                        state = 0
+                        new_word = ""
+
+            elif state == 9:
+                if letter == 'f':
+                    new_word += letter
+                    print("Logre pasar por aquí")
+                    state = 14
+                elif letter == 'j':
+                    new_word += letter
+                    print("Logre pasar por aquí")
+                    state = 10
+                elif letter == 'n':
+                    new_word += letter
+                    state = 13
+                else:
+                    error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
+                    self.error_list.append(error)
+                    state = 0
+                    new_word = ""
+
+            
+            elif state == 10:
+                if letter == 'i':
+                    new_word += letter
+                    print("Pues logre estar en i")
+                    state = 13
+                elif letter == 'f':
+                    new_word += letter
+                    print("Pues logre estar en f")
+                    state = 13
+                else:
+                    error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
+                    new_word = ""
+                    self.error_list.append(error)
+                    state = 0
+
+            elif state == 11:
+                if letter != ' ':
+                    if text[char+1] != None and text[char+1] != ' ':
+                        try:
+                            new_number = letter+text[char+1]
+                            token_number = int(new_number)
+                            token = Token("Cadena",token_number, line, column)
+                            self.token_list.append(token)
+                            new_word = ""
+                            state = 0
+                            print('El nuevo número es:', str(new_number))
+                        except ValueError:
+                            error=Error('Entrada incorrecta: {} -> {}'.format(new_word, letter),"No se ingreso el número correctamente",line,column)
+                            new_word = ""
+                            self.error_list.append(error)
+                            state = 0
+                    else:
+                        try:
+                            token_number = int(letter)
+                            token = Token("Cadena",token_number, line, column)
+                            self.token_list.append(token)
+                            new_word = ""
+                            state = 0
+                            print('El nuevo número es:', str(new_number))
+                        except ValueError:
+                            error=Error('Entrada incorrecta: {} -> {}'.format(new_word, letter),"No se ingreso el número correctamente",line,column)
+                            new_word = ""
+                            self.error_list.append(error)
+                            state = 0
+
+
+            elif state == 12:
+                if letter != ' ' and letter != '#':
+                    print(letter)
+                    new_word += letter
+                    print('pase')
+                else:
+                    print('paseeeeee')
+                    token = Token("Cadena",new_word, line, column)
+                    self.token_list.append(token)
+                    print("El nombre del documento es: {}".format(new_word))
+                    new_word = ""
+                    state = 0
+            
+            elif state == 13:
+                if letter == ' ':
+                    print("Pues logre estar en espacio")
+                    token = Token("Cadena",new_word, line, column)
+                    self.token_list.append(token)
+                    new_word = ' '
+                    state = 11
+
+            elif state == 14:
+                if letter == ' ':
+                    print("Pues logre estar en espacio")
+                    token = Token("Cadena",new_word, line, column)
+                    self.token_list.append(token)
+                    new_word = ''
+                    state = 12
+            
+            elif state == 15:
+                if letter != '>':
+                    new_word += letter
+                else:
+                    if len(new_word) == 9:  
+                        token = Token("Cadena",new_word, line, column)
+                        self.token_list.append(token)
+                        new_word = ''
+                        new_word = letter
+                        token = Token("Cierre",new_word, line, column)
+                        self.token_list.append(token)
+                        new_word = ''
+                    else:
+                        error=Error('Entrada incorrecta: {} -> {}'.format(new_word, letter),"No se ingreso el número correctamente",line,column)
+                        new_word = ""
+                        self.error_list.append(error)
+                        state = 0
+
+            elif state == 16:
+                if letter != '\'' and letter != '\"':
+                    new_word += letter
+                else:
+                    token = Token("Cadena",new_word, line, column)
+                    self.token_list.append(token)
+                    new_word = ''
+                    state = 0
+
+
+        self.final_token_list.extend(self.token_list)
+
+
+                    
+    def get_temp_token_list(self):
+        return self.token_list
+
+    def get_token_list(self):
+        return self.final_token_list
+    
+    def get_error_list(self):
+        return self.error_list
+        
+                    
+
+    def clean_token_report(self):
+        self.final_token_list.clear()
+    
+    def clean_error_report(self):
+        self.error_list.clear()
+        self.semantic_error_list.clear()
