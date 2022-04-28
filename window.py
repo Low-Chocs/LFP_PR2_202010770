@@ -12,8 +12,8 @@ class Window:
         self.root.config(menu = self.my_menu)
         self.root.title("LFP Proyecto Final 202010770")
         self.root.geometry("850x500")
-        self.root.iconbitmap('liga.ico')
-        self.message = "Bot: Bienvenido a La Liga Bot, ingresa un comando \n"
+        self.root.iconbitmap('images/liga.ico')
+        self.message = "Bot: Bienvenido a La Liga Bot, ingresa un comando \n\n"
         self.lexical_analysis = lexical_analyzer()
         self.semantical_analysis = semantical()
         self.token_report = token_report()
@@ -75,17 +75,19 @@ class Window:
     #Functions of the buttons
     def send_message(self):
         self.read_box.delete('1.0', END)
-        self.message += 'Tú: {}'.format(self.chat_box.get("1.0",END))
+        self.message += 'Tú: {}\n'.format(self.chat_box.get("1.0",END))
         text_to_analyze = self.chat_box.get("1.0",END)
         self.chat_box.delete("1.0",END)
         self.read_box.insert('1.0',self.message)
         self.lexical_analysis.analyzer(text_to_analyze)
-        if self.semantical_analysis.reading(self.lexical_analysis.get_temp_token_list()) != None:
-            self.message +=  'BOT: {}\n'.format(self.semantical_analysis.reading(self.lexical_analysis.get_temp_token_list()))
+        new_list = []
+        if self.semantical_analysis.reading(self.lexical_analysis.get_temp_token_list(), self.lexical_analysis.get_error_list()) != None:
+            self.message +=  'BOT: {}\n\n'.format(self.semantical_analysis.reading(self.lexical_analysis.get_temp_token_list(), self.lexical_analysis.get_error_list()))
         else:
             self.message +=  'BOT: No he logrado entender lo que me has dicho'
         self.read_box.delete("1.0",END)
         self.read_box.insert('1.0',self.message)
+        self.lexical_analysis.get_error_list().extend(new_list)
             
     
     def token_report_function(self):

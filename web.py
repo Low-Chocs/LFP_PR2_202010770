@@ -8,7 +8,7 @@ class token_report:
         <html lang="en">
         <head>
     <title>Lexic Report</title>
-    <link rel="stylesheet" href="report.css">
+    <link rel="stylesheet" href="html/Css/report.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">
@@ -76,7 +76,7 @@ class error_report:
         <html lang="en">
         <head>
     <title>Lexic Report</title>
-    <link rel="stylesheet" href="report.css">
+    <link rel="stylesheet" href="html/Css/report.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">

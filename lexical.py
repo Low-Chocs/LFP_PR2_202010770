@@ -1,5 +1,5 @@
-from ftplib import B_CRLF
-from re import S
+
+from ctypes import FormatError
 from token_list import Token
 from token_list import Error
 
@@ -246,6 +246,11 @@ class lexical_analyzer:
                     continue
 
                 else:
+                    try:
+                        number = int(letter)
+                        token = Token("Numero",number, line, column)
+                        self.token_list.append(token)
+                    except:
                         error=Error("Entrada incorrecta: {} -> {}".format(new_word, letter),"No se identifico la palabra reservada",line,column)
                         new_word = ""
                         self.error_list.append(error)
