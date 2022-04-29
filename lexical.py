@@ -1553,7 +1553,7 @@ class lexical_analyzer:
                         try:
                             new_number = letter+text[char+1]
                             token_number = int(new_number)
-                            token = Token("Cadena",token_number, line, column)
+                            token = Token("Numero",token_number, line, column)
                             self.token_list.append(token)
                             new_word = ""
                             state = 0
@@ -1565,8 +1565,9 @@ class lexical_analyzer:
                             state = 0
                     else:
                         try:
+                            new_number = letter+text[char+1]
                             token_number = int(letter)
-                            token = Token("Cadena",token_number, line, column)
+                            token = Token("Numero",token_number, line, column)
                             self.token_list.append(token)
                             new_word = ""
                             state = 0
@@ -1602,6 +1603,7 @@ class lexical_analyzer:
             elif state == 14:
                 if letter == ' ':
                     print("Pues logre estar en espacio")
+                    print(new_word)
                     token = Token("Cadena",new_word, line, column)
                     self.token_list.append(token)
                     new_word = ''
@@ -1619,6 +1621,7 @@ class lexical_analyzer:
                         token = Token("Cierre",new_word, line, column)
                         self.token_list.append(token)
                         new_word = ''
+                        state = 0
                     else:
                         error=Error('Entrada incorrecta: {} -> {}'.format(new_word, letter),"No se ingreso el número correctamente",line,column)
                         new_word = ""

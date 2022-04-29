@@ -3,6 +3,7 @@ from lexical import lexical_analyzer
 from semantical import semantical
 from web import token_report
 from web import error_report
+import os
 
 class Window:
 
@@ -47,11 +48,11 @@ class Window:
         self.clean_token_log_button.pack()
         self.clean_token_log_button.place(x = 680, y = 190)
 
-        self.user_manual_button = Button(self.main_frame, text = "MANUAL DE USUARIO", width= 20, height=3, bg = "BLACK", foreground = "#f4fcc8", font = (("Futura Maxi CG Clara", 8, "bold")), bd = 5)
+        self.user_manual_button = Button(self.main_frame, text = "MANUAL DE USUARIO", width= 20, height=3, bg = "BLACK", foreground = "#f4fcc8", font = (("Futura Maxi CG Clara", 8, "bold")), bd = 5, command = self.open_user_manual)
         self.user_manual_button.pack()
         self.user_manual_button.place(x = 680, y = 250)
 
-        self.tecnic_manual_button = Button(self.main_frame, text = "MANUAL TÉCNICO", width= 20, height=3, bg = "BLACK", foreground = "#f4fcc8", font = (("Futura Maxi CG Clara", 8, "bold")), bd = 5)
+        self.tecnic_manual_button = Button(self.main_frame, text = "MANUAL TÉCNICO", width= 20, height=3, bg = "BLACK", foreground = "#f4fcc8", font = (("Futura Maxi CG Clara", 8, "bold")), bd = 5, command = self.open_tecnic_manual)
         self.tecnic_manual_button.pack()
         self.tecnic_manual_button.place(x = 680, y = 310)
 
@@ -108,3 +109,10 @@ class Window:
 
     def clean_error_report(self):
         self.lexical_analysis.clean_error_report()
+    
+    def open_user_manual(self):
+        os.startfile('Manuales\ManualU.pdf')
+
+    def open_tecnic_manual(self):
+        os.startfile('Manuales\ManualT.pdf')
+
